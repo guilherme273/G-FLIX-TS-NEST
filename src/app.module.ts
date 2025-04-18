@@ -2,11 +2,15 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { validationSchema } from './config/validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env.development.local',
+      isGlobal: true,
+      validationSchema,
     }),
 
     TypeOrmModule.forRoot({
@@ -22,6 +26,7 @@ import { UserModule } from './user/user.module';
     }),
 
     UserModule,
+    AuthModule,
   ],
 
   controllers: [],

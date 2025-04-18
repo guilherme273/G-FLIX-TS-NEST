@@ -11,6 +11,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 
+export interface TokenUser {
+  access_token: string;
+  user: number;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -20,8 +25,8 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
-  async signIn(data: AuthDTO): Promise<{ access_token: string }> {
-    const user = await this.userRepository.find({
+  async signIn(data: AuthDTO): Promise<TokenUser> {
+    const user = await this.userRepository.findOne({
       where: { email: data.email },
     });
     if (!user) throw new NotFoundException('User not found!');
@@ -33,6 +38,7 @@ export class AuthService {
 
     return {
       access_token: await this.jwt.signAsync(payload),
+      user: user.id,
     };
   }
 }

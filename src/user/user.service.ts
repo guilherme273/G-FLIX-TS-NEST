@@ -21,11 +21,15 @@ export class UserService {
       type: 0,
     });
 
-    return await this.userReposytory.save(user);
+    const savedUser = await this.userReposytory.save(user);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...userWithoutPassword } = savedUser;
+    return userWithoutPassword;
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    return await this.userReposytory.find();
   }
 
   findOne(id: number) {
