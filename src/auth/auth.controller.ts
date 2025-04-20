@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { AuthService, TokenUser } from './auth.service';
+import { AuthService } from './auth.service';
 import { AuthDTO } from './auth.dto';
 
 @Controller()
@@ -7,7 +7,7 @@ export class AuthController {
   constructor(private readonly AuthService: AuthService) {}
 
   @Post('signin')
-  async signIn(@Body() data: AuthDTO): Promise<TokenUser> {
+  async signIn(@Body() data: AuthDTO) {
     return this.AuthService.signIn(data);
   }
 }

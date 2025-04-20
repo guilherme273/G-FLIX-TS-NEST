@@ -14,6 +14,19 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    const existingUser = await this.userReposytory.findOne({
+      where: { email: createUserDto.email },
+    });
+
+    if (existingUser) {
+      return {
+        msg: {
+          type: 'error',
+          content: `Email: ${existingUser.email} já cadastrado!`,
+        },
+      };
+    }
+
     const password = await hash(createUserDto.password, 15);
     const user = this.userReposytory.create({
       ...createUserDto,
@@ -25,7 +38,13 @@ export class UserService {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = savedUser;
-    return userWithoutPassword;
+    return {
+      ...userWithoutPassword,
+      msg: {
+        type: 'success',
+        content: `${savedUser.name} cadastrado com sucesso!`,
+      },
+    };
   }
 
   async findAll() {
