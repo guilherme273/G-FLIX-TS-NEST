@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDTO } from './auth.dto';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
+import { AuthDTO } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,8 +38,14 @@ export class AuthService {
 
     return {
       access_token: await this.jwt.signAsync(payload),
-      user: user.id,
+      userId: user.id,
       msg: { type: 'success', content: `Seja bem-vindo, ${user.name}!` },
+    };
+  }
+
+  isAtuhenticated() {
+    return {
+      atuhenticated: true,
     };
   }
 }
