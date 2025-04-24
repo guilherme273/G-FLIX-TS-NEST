@@ -42,10 +42,4 @@ export class AuthService {
       msg: { type: 'success', content: `Seja bem-vindo, ${user.name}!` },
     };
   }
-
-  isAtuhenticated() {
-    return {
-      atuhenticated: true,
-    };
-  }
 }

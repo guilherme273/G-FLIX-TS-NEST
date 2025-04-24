@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { validationSchema } from './config/validation';
+import { CategoryModule } from './category/category.module';
+import { MovieModule } from './movie/movie.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { validationSchema } from './config/validation';
 
     UserModule,
     AuthModule,
+    CategoryModule,
+    MovieModule,
   ],
 
   controllers: [],
