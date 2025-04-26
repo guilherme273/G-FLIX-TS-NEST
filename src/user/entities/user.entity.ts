@@ -1,9 +1,11 @@
+import { ReactionsEntity } from 'src/reactions/entities/reaction.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'user' })
@@ -37,4 +39,7 @@ export class UserEntity {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => ReactionsEntity, (reaction) => reaction.user)
+  reactions: ReactionsEntity[];
 }

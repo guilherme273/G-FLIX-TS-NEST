@@ -1,0 +1,82 @@
+import { Injectable } from '@nestjs/common';
+import { CreateReactionDto } from './dto/create-reaction.dto';
+import { UpdateReactionDto } from './dto/update-reaction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ReactionsEntity } from './entities/reaction.entity';
+import { Repository } from 'typeorm';
+import { ReactionTypeEntity } from 'src/reactions_types/entities/reactions_type.entity';
+
+@Injectable()
+export class ReactionsService {
+  constructor(
+    @InjectRepository(ReactionsEntity)
+    private readonly reactionsRepository: Repository<ReactionsEntity>,
+  ) {}
+
+  async createOrUpdateOrDelete(createReactionDto: CreateReactionDto) {
+    const existSomeReactionForThisMovie =
+      await this.reactionsRepository.findOne({
+        where: {
+          id_user: createReactionDto.id_user,
+          id_movie: createReactionDto.id_movie,
+        },
+      });
+
+    if (existSomeReactionForThisMovie) {
+      if (
+        existSomeReactionForThisMovie.id_reactions_type ===
+        createReactionDto.id_reactions_type
+      ) {
+        await this.reactionsRepository.delete(existSomeReactionForThisMovie);
+        return {
+          msg: {
+            type: 'success',
+            content: 'Deletada a reação existente',
+          },
+        };
+      }
+
+      existSomeReactionForThisMovie.reactionType = {
+        id: createReactionDto.id_reactions_type,
+      } as ReactionTypeEntity;
+
+      const updatedReaction = await this.reactionsRepository.save(
+        existSomeReactionForThisMovie,
+      );
+      return {
+        updatedReaction,
+        msg: {
+          type: 'success',
+          content: 'Reação Atualizada!',
+        },
+      };
+    }
+
+    const newReactionForThisMovie =
+      await this.reactionsRepository.save(createReactionDto);
+
+    return {
+      newReactionForThisMovie,
+      msg: {
+        type: 'success',
+        content: 'Reação Criada!',
+      },
+    };
+  }
+
+  findAll() {
+    return `This action returns all reactions`;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} reaction`;
+  }
+
+  update(id: number, updateReactionDto: UpdateReactionDto) {
+    return `This action updates a #${id} reaction`;
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} reaction`;
+  }
+}

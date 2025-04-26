@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { validationSchema } from './config/validation';
 import { CategoryModule } from './category/category.module';
 import { MovieModule } from './movie/movie.module';
+import { ReactionsTypesModule } from './reactions_types/reactions_types.module';
+import { ReactionsModule } from './reactions/reactions.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { MovieModule } from './movie/movie.module';
     AuthModule,
     CategoryModule,
     MovieModule,
+    ReactionsTypesModule,
+    ReactionsModule,
   ],
 
   controllers: [],

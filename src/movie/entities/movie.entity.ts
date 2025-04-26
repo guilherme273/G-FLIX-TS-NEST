@@ -1,4 +1,5 @@
 import { CategoryEntity } from 'src/category/entities/category.entity';
+import { ReactionsEntity } from 'src/reactions/entities/reaction.entity';
 import {
   Entity,
   Column,
@@ -7,6 +8,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'movie' })
@@ -35,4 +37,8 @@ export class MovieEntity {
   })
   @JoinColumn({ name: 'category_id' })
   category: CategoryEntity;
+
+  @OneToMany(() => ReactionsEntity, (reaction) => reaction.movie)
+  reactions: ReactionsEntity[];
+  reactionCounts: any;
 }
