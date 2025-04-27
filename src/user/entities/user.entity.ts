@@ -1,3 +1,4 @@
+import { FavoritesEntity } from 'src/favorites/entities/favorite.entity';
 import { ReactionsEntity } from 'src/reactions/entities/reaction.entity';
 import {
   Column,
@@ -42,4 +43,7 @@ export class UserEntity {
 
   @OneToMany(() => ReactionsEntity, (reaction) => reaction.user)
   reactions: ReactionsEntity[];
+
+  @OneToMany(() => FavoritesEntity, (favorite) => favorite.user)
+  favorites: FavoritesEntity[];
 }

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { UpdateMovieDto } from './dto/update-movie.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovieEntity } from './entities/movie.entity';
 import { Repository } from 'typeorm';
@@ -75,6 +74,7 @@ export class MovieService {
         'movies',
         'movies.reactions',
         'movies.reactions.reactionType',
+        'movies.favorites',
       ],
       order: {
         name: 'ASC',
@@ -114,10 +114,6 @@ export class MovieService {
 
   findOne(id: number) {
     return `This action returns a #${id} movie`;
-  }
-
-  update(id: number, updateMovieDto: UpdateMovieDto) {
-    return `This action updates a #${id} movie`;
   }
 
   remove(id: number) {

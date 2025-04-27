@@ -1,4 +1,5 @@
 import { CategoryEntity } from 'src/category/entities/category.entity';
+import { FavoritesEntity } from 'src/favorites/entities/favorite.entity';
 import { ReactionsEntity } from 'src/reactions/entities/reaction.entity';
 import {
   Entity,
@@ -41,4 +42,7 @@ export class MovieEntity {
   @OneToMany(() => ReactionsEntity, (reaction) => reaction.movie)
   reactions: ReactionsEntity[];
   reactionCounts: any;
+
+  @OneToMany(() => FavoritesEntity, (favorites) => favorites.movie)
+  favorites: FavoritesEntity[];
 }
