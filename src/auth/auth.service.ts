@@ -34,11 +34,10 @@ export class AuthService {
       };
     }
 
-    const payload = { user: user.id };
+    const payload = { sub: user.id, type: user.type };
 
     return {
       access_token: await this.jwt.signAsync(payload),
-      userId: user.id,
       msg: { type: 'success', content: `Seja bem-vindo, ${user.name}!` },
     };
   }
