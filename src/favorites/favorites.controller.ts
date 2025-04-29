@@ -1,17 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { GetUserFromPayload } from 'src/Decorators/user.decorator';
 
 @Controller('favorites')
 export class FavoritesController {
@@ -19,30 +10,11 @@ export class FavoritesController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createFavoriteDto: CreateFavoriteDto) {
-    return this.favoritesService.createOrDelete(createFavoriteDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.favoritesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoritesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavoriteDto: UpdateFavoriteDto,
+  create(
+    @Body() createFavoriteDto: CreateFavoriteDto,
+    @GetUserFromPayload('sub') user_id: number,
   ) {
-    return this.favoritesService.update(+id, updateFavoriteDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favoritesService.remove(+id);
+    console.log(user_id);
+    return this.favoritesService.createOrDelete(createFavoriteDto, user_id);
   }
 }

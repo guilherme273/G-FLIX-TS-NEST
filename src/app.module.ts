@@ -9,6 +9,7 @@ import { MovieModule } from './movie/movie.module';
 import { ReactionsTypesModule } from './reactions_types/reactions_types.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     ReactionsTypesModule,
     ReactionsModule,
     FavoritesModule,
+    AdminModule,
   ],
 
   controllers: [],

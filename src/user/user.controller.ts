@@ -10,6 +10,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { AdminGuard } from 'src/admin/adminGuard';
 
 @Controller('user')
 export class UserController {
@@ -18,6 +19,12 @@ export class UserController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @UseGuards(AuthGuard, AdminGuard)
+  @Get('authenticator-admin')
+  getProfile() {
+    return true;
   }
 
   @UseGuards(AuthGuard)

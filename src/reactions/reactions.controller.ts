@@ -1,17 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { ReactionsService } from './reactions.service';
 import { CreateReactionDto } from './dto/create-reaction.dto';
-import { UpdateReactionDto } from './dto/update-reaction.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { GetUserFromPayload } from 'src/Decorators/user.decorator';
 
 @Controller('reactions')
 export class ReactionsController {
@@ -19,30 +10,13 @@ export class ReactionsController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createReactionDto: CreateReactionDto) {
-    return this.reactionsService.createOrUpdateOrDelete(createReactionDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.reactionsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reactionsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateReactionDto: UpdateReactionDto,
+  create(
+    @Body() createReactionDto: CreateReactionDto,
+    @GetUserFromPayload('sub') user_id: number,
   ) {
-    return this.reactionsService.update(+id, updateReactionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reactionsService.remove(+id);
+    return this.reactionsService.createOrUpdateOrDelete(
+      createReactionDto,
+      user_id,
+    );
   }
 }

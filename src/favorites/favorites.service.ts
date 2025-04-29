@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoritesEntity } from './entities/favorite.entity';
 import { Repository } from 'typeorm';
@@ -12,11 +11,11 @@ export class FavoritesService {
     private readonly favoritesRepository: Repository<FavoritesEntity>,
   ) {}
 
-  async createOrDelete(createFavoriteDto: CreateFavoriteDto) {
+  async createOrDelete(createFavoriteDto: CreateFavoriteDto, user_id: number) {
     const isForDelete = await this.favoritesRepository.findOne({
       where: {
-        id_movie: createFavoriteDto.id_movie,
-        id_user: createFavoriteDto.id_user,
+        id_movie: user_id,
+        id_user: user_id,
       },
     });
 
@@ -30,28 +29,15 @@ export class FavoritesService {
       };
     }
 
-    await this.favoritesRepository.save(createFavoriteDto);
+    await this.favoritesRepository.save({
+      ...createFavoriteDto,
+      id_user: user_id,
+    });
     return {
       msg: {
         type: 'success',
         content: 'Filme adicionado aos favoritos!',
       },
     };
-  }
-
-  findAll() {
-    return `This action returns all favorites`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} favorite`;
-  }
-
-  update(id: number, updateFavoriteDto: UpdateFavoriteDto) {
-    return `This action updates a #${id} favorite`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} favorite`;
   }
 }

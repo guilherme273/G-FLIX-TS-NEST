@@ -34,7 +34,7 @@ export class AuthService {
       };
     }
 
-    const payload = { sub: user.id, type: user.type };
+    const payload = { sub: user.id };
 
     return {
       access_token: await this.jwt.signAsync(payload),

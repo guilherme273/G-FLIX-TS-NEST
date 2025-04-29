@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReactionDto } from './dto/create-reaction.dto';
-import { UpdateReactionDto } from './dto/update-reaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReactionsEntity } from './entities/reaction.entity';
 import { Repository } from 'typeorm';
@@ -13,11 +12,14 @@ export class ReactionsService {
     private readonly reactionsRepository: Repository<ReactionsEntity>,
   ) {}
 
-  async createOrUpdateOrDelete(createReactionDto: CreateReactionDto) {
+  async createOrUpdateOrDelete(
+    createReactionDto: CreateReactionDto,
+    user_id: number,
+  ) {
     const existSomeReactionForThisMovie =
       await this.reactionsRepository.findOne({
         where: {
-          id_user: createReactionDto.id_user,
+          id_user: user_id,
           id_movie: createReactionDto.id_movie,
         },
       });
@@ -52,8 +54,10 @@ export class ReactionsService {
       };
     }
 
-    const newReactionForThisMovie =
-      await this.reactionsRepository.save(createReactionDto);
+    const newReactionForThisMovie = await this.reactionsRepository.save({
+      ...createReactionDto,
+      id_user: user_id,
+    });
 
     return {
       newReactionForThisMovie,
@@ -62,21 +66,5 @@ export class ReactionsService {
         content: 'Reação Criada!',
       },
     };
-  }
-
-  findAll() {
-    return `This action returns all reactions`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} reaction`;
-  }
-
-  update(id: number, updateReactionDto: UpdateReactionDto) {
-    return `This action updates a #${id} reaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} reaction`;
   }
 }
