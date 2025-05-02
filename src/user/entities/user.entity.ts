@@ -1,5 +1,6 @@
 import { FavoritesEntity } from 'src/favorites/entities/favorite.entity';
 import { ReactionsEntity } from 'src/reactions/entities/reaction.entity';
+import { ViewEntity } from 'src/view/entities/view.entity';
 import {
   Column,
   Entity,
@@ -46,4 +47,7 @@ export class UserEntity {
 
   @OneToMany(() => FavoritesEntity, (favorite) => favorite.user)
   favorites: FavoritesEntity[];
+
+  @OneToMany(() => ViewEntity, (view) => view.user)
+  views: ViewEntity[];
 }

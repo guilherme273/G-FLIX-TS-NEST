@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovieEntity } from './entities/movie.entity';
@@ -31,12 +36,12 @@ export class MovieService {
     });
 
     if (movie) {
-      return {
+      throw new ConflictException({
         msg: {
           type: 'error',
           content: `Filme: ${movie.title} já cadastrado!`,
         },
-      };
+      });
     }
 
     const category = await this.categoryRepository.findOne({
@@ -44,72 +49,94 @@ export class MovieService {
     });
 
     if (!category) {
-      return {
+      throw new NotFoundException({
         msg: {
           type: 'error',
           content: `Categoria não encontrada!`,
         },
-      };
+      });
     }
 
-    const movieCreated = await this.movieRepository.save({
-      title: createMovieDto.title,
-      url: createMovieDto.url,
-      cover: createMovieDto.cover,
-      category: category,
-    });
+    try {
+      const movieCreated = await this.movieRepository.save({
+        title: createMovieDto.title,
+        url: createMovieDto.url,
+        cover: createMovieDto.cover,
+        category: category,
+      });
 
-    return {
-      movieCreated,
-      msg: {
-        type: 'success',
-        content: `Filme: ${movieCreated.title} cadastrado com sucesso!`,
-      },
-    };
+      return {
+        movieCreated,
+        msg: {
+          type: 'success',
+          content: `Filme: ${movieCreated.title} cadastrado com sucesso!`,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+
+      throw new InternalServerErrorException({
+        msg: {
+          type: 'error',
+          content: 'Erro ao salvar o filme, contate o suporte!',
+        },
+      });
+    }
   }
 
   async findAll() {
-    const categories = await this.categoryRepository.find({
-      relations: [
-        'movies',
-        'movies.reactions',
-        'movies.reactions.reactionType',
-        'movies.favorites',
-      ],
-      order: {
-        name: 'ASC',
-      },
-    });
+    try {
+      const categories = await this.categoryRepository.find({
+        relations: [
+          'movies',
+          'movies.reactions',
+          'movies.reactions.reactionType',
+          'movies.favorites',
+          'movies.views',
+        ],
+        order: {
+          name: 'ASC',
+        },
+      });
 
-    const rawCounts: ReactionCountRaw[] = await this.reactionsRepository
-      .createQueryBuilder('reaction')
-      .select('reaction.id_movie', 'movieId')
-      .addSelect('reaction.id_reactions_type', 'reactionTypeId')
-      .addSelect('COUNT(*)', 'count')
-      .groupBy('reaction.id_movie')
-      .addGroupBy('reaction.id_reactions_type')
-      .getRawMany();
+      const rawCounts: ReactionCountRaw[] = await this.reactionsRepository
+        .createQueryBuilder('reaction')
+        .select('reaction.id_movie', 'movieId')
+        .addSelect('reaction.id_reactions_type', 'reactionTypeId')
+        .addSelect('COUNT(*)', 'count')
+        .groupBy('reaction.id_movie')
+        .addGroupBy('reaction.id_reactions_type')
+        .getRawMany();
 
-    const groupedCounts: GroupedCounts = rawCounts.reduce((acc, curr) => {
-      const movieId = Number(curr.movieId);
-      const reactionTypeId = Number(curr.reactionTypeId);
-      const count = parseInt(curr.count, 10);
+      const groupedCounts: GroupedCounts = rawCounts.reduce((acc, curr) => {
+        const movieId = Number(curr.movieId);
+        const reactionTypeId = Number(curr.reactionTypeId);
+        const count = parseInt(curr.count, 10);
 
-      if (!acc[movieId]) acc[movieId] = {};
-      acc[movieId][reactionTypeId] = count;
+        if (!acc[movieId]) acc[movieId] = {};
+        acc[movieId][reactionTypeId] = count;
 
-      return acc;
-    }, {} as GroupedCounts);
+        return acc;
+      }, {} as GroupedCounts);
 
-    for (const category of categories) {
-      for (const movie of category.movies) {
-        movie.reactionCounts = groupedCounts[movie.id] ?? {};
+      for (const category of categories) {
+        for (const movie of category.movies) {
+          movie.reactionCounts = groupedCounts[movie.id] ?? {};
+        }
       }
-    }
 
-    return {
-      movies: categories,
-    };
+      return {
+        movies: categories,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException({
+        msg: {
+          type: 'error',
+          content: 'Erro ao buscar os filmes, contate o suporte!',
+        },
+      });
+    }
   }
 
   findOne(id: number) {

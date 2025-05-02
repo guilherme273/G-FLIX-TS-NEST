@@ -1,10 +1,18 @@
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -19,40 +27,98 @@ export class UserService {
     });
 
     if (existingUser) {
-      return {
+      throw new ConflictException({
         msg: {
           type: 'error',
           content: `Email: ${existingUser.email} já cadastrado!`,
         },
-      };
+      });
     }
 
-    const password = await hash(createUserDto.password, 15);
-    const user = this.userReposytory.create({
-      ...createUserDto,
-      password: password,
-      type: 0,
-    });
+    try {
+      const password = await hash(createUserDto.password, 15);
+      const user = this.userReposytory.create({
+        ...createUserDto,
+        password: password,
+        type: 0,
+      });
 
-    const savedUser = await this.userReposytory.save(user);
+      const savedUser = await this.userReposytory.save(user);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...userWithoutPassword } = savedUser;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _, ...userWithoutPassword } = savedUser;
+      return {
+        ...userWithoutPassword,
+        msg: {
+          type: 'success',
+          content: `${savedUser.name} cadastrado com sucesso!`,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException({
+        msg: {
+          type: 'error',
+          content: 'Erro ao salvar usuário, contate o suporte!',
+        },
+      });
+    }
+  }
+
+  async updatePassword(
+    updateUserPasswordDto: UpdateUserPasswordDto,
+    user_id: number,
+  ) {
+    const user = await this.userReposytory.findOne({ where: { id: user_id } });
+
+    if (!user) {
+      throw new NotFoundException({
+        msg: { type: 'error', content: 'Usuário Não encontrado!' },
+      });
+    }
+
+    const isMatch = await bcrypt.compare(
+      updateUserPasswordDto.oldPassword,
+      user.password,
+    );
+    if (!isMatch) {
+      throw new BadRequestException({
+        msg: { type: 'error', content: 'Senha Atual Inválida!' },
+      });
+    }
+
+    const newPassword = await hash(updateUserPasswordDto.newPassword, 15);
+    user.password = newPassword;
+    await this.userReposytory.save(user);
+
     return {
-      ...userWithoutPassword,
       msg: {
         type: 'success',
-        content: `${savedUser.name} cadastrado com sucesso!`,
+        content: 'Senha atualizada com sucesso!',
       },
     };
   }
 
   async findAll() {
-    return await this.userReposytory.find();
+    const users = await this.userReposytory.find();
+    return {
+      users,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.userReposytory.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException({
+        msg: { type: 'error', content: 'Usuário não encontrado!' },
+      });
+    }
+
+    return {
+      name: user.name,
+      email: user.email,
+    };
   }
 
   // update(id: number, updateUserDto: UpdateUserDto) {

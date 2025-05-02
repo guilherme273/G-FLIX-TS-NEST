@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FavoritesEntity } from './entities/favorite.entity';
@@ -12,32 +12,42 @@ export class FavoritesService {
   ) {}
 
   async createOrDelete(createFavoriteDto: CreateFavoriteDto, user_id: number) {
-    const isForDelete = await this.favoritesRepository.findOne({
-      where: {
-        id_movie: user_id,
-        id_user: user_id,
-      },
-    });
+    try {
+      const isForDelete = await this.favoritesRepository.findOne({
+        where: {
+          id_movie: createFavoriteDto.id_movie,
+          id_user: user_id,
+        },
+      });
 
-    if (isForDelete) {
-      await this.favoritesRepository.delete(isForDelete);
+      if (isForDelete) {
+        await this.favoritesRepository.delete(isForDelete);
+        return {
+          msg: {
+            type: 'success',
+            content: 'Filme removido dos favoritos!',
+          },
+        };
+      }
+
+      await this.favoritesRepository.save({
+        ...createFavoriteDto,
+        id_user: user_id,
+      });
       return {
         msg: {
           type: 'success',
-          content: 'Filme removido dos favoritos!',
+          content: 'Filme adicionado aos favoritos!',
         },
       };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException({
+        msg: {
+          type: 'error',
+          content: 'Erro na requisição, contate o suporte!',
+        },
+      });
     }
-
-    await this.favoritesRepository.save({
-      ...createFavoriteDto,
-      id_user: user_id,
-    });
-    return {
-      msg: {
-        type: 'success',
-        content: 'Filme adicionado aos favoritos!',
-      },
-    };
   }
 }

@@ -6,11 +6,13 @@ import {
   Param,
   Delete,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { AdminGuard } from 'src/admin/adminGuard';
+import { GetUserFromPayload } from 'src/Decorators/user.decorator';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -21,21 +23,25 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @UseGuards(AuthGuard, AdminGuard)
-  @Get('authenticator-admin')
-  getProfile() {
-    return true;
-  }
-
   @UseGuards(AuthGuard)
-  @Get()
+  @Get('get-all')
   findAll() {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @UseGuards(AuthGuard)
+  @Patch()
+  updatePassword(
+    @Body() updateUserPasswordDto: UpdateUserPasswordDto,
+    @GetUserFromPayload('sub') user_id: number,
+  ) {
+    return this.userService.updatePassword(updateUserPasswordDto, +user_id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  findOne(@GetUserFromPayload('sub') user_id: number) {
+    return this.userService.findOne(+user_id);
   }
 
   @Delete(':id')

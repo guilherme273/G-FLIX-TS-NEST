@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateReactionsTypeDto } from './dto/create-reactions_type.dto';
 import { UpdateReactionsTypeDto } from './dto/update-reactions_type.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,25 +22,35 @@ export class ReactionsTypesService {
     });
 
     if (existThisReactionType) {
-      return {
+      throw new ConflictException({
         msg: {
           type: 'error',
-          content: 'Tipo de Reação já existente!',
+          content: 'Tipo de reação já existente!',
         },
-      };
+      });
     }
 
-    const reactionType = await this.reactionTypeRepository.save(
-      createReactionsTypeDto,
-    );
+    try {
+      const reactionType = await this.reactionTypeRepository.save(
+        createReactionsTypeDto,
+      );
 
-    return {
-      reactionType,
-      msg: {
-        type: 'success',
-        content: 'reação cadastrada com sucesso!',
-      },
-    };
+      return {
+        reactionType,
+        msg: {
+          type: 'success',
+          content: 'reação cadastrada com sucesso!',
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException({
+        msg: {
+          type: 'error',
+          content: 'Erro ao salvar novo tipo de reação, contate o suporte!',
+        },
+      });
+    }
   }
 
   findAll() {

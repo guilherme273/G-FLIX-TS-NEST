@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -22,16 +26,16 @@ export class AuthService {
       where: { email: data.email },
     });
     if (!user) {
-      return {
+      throw new NotFoundException({
         msg: { type: 'error', content: 'Usuário não encontrado!' },
-      };
+      });
     }
 
     const isMatch = await bcrypt.compare(data.password, user.password);
     if (!isMatch) {
-      return {
+      throw new BadRequestException({
         msg: { type: 'error', content: 'Usuário ou senha inválidos!' },
-      };
+      });
     }
 
     const payload = { sub: user.id };

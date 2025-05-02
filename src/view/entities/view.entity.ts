@@ -9,8 +9,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('favorites')
-export class FavoritesEntity {
+@Entity('view')
+export class ViewEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,13 +26,13 @@ export class FavoritesEntity {
   @CreateDateColumn({ name: 'updated_at' })
   updated_at: Date;
 
-  @ManyToOne(() => MovieEntity, (movie) => movie.favorites, {
+  @ManyToOne(() => MovieEntity, (movie) => movie.views, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'id_movie' })
   movie: MovieEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.favorites, {
+  @ManyToOne(() => UserEntity, (user) => user.views, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'id_user' })

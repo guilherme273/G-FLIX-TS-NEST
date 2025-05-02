@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
@@ -17,24 +21,34 @@ export class CategoryService {
     });
 
     if (category) {
-      return {
+      throw new ConflictException({
         msg: {
           type: 'error',
           content: `Categoria: ${category.name} já cadastrada!`,
         },
-      };
+      });
     }
 
-    const categoryCreated =
-      await this.categoryRepository.save(createCategoryDto);
+    try {
+      const categoryCreated =
+        await this.categoryRepository.save(createCategoryDto);
 
-    return {
-      categoryCreated,
-      msg: {
-        type: 'success',
-        content: `Categoria: ${categoryCreated.name} cadastrada com sucesso!`,
-      },
-    };
+      return {
+        categoryCreated,
+        msg: {
+          type: 'success',
+          content: `Categoria: ${categoryCreated.name} cadastrada com sucesso!`,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException({
+        msg: {
+          type: 'error',
+          content: 'erro no servidor ao salvar categoria, contate o suporte!',
+        },
+      });
+    }
   }
 
   findAll() {

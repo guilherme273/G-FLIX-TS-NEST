@@ -24,7 +24,9 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Token is required!');
+      throw new UnauthorizedException({
+        msg: { type: 'error', content: 'Um token é requerido para esta rota!' },
+      });
     }
 
     try {
@@ -36,7 +38,9 @@ export class AuthGuard implements CanActivate {
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException({
+        msg: { type: 'error', content: 'Token inválido!' },
+      });
     }
 
     return true;

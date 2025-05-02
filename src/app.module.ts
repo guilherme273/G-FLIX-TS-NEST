@@ -10,6 +10,7 @@ import { ReactionsTypesModule } from './reactions_types/reactions_types.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { AdminModule } from './admin/admin.module';
+import { ViewModule } from './view/view.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AdminModule } from './admin/admin.module';
     ReactionsModule,
     FavoritesModule,
     AdminModule,
+    ViewModule,
   ],
 
   controllers: [],

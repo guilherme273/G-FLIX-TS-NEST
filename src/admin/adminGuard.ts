@@ -22,13 +22,20 @@ export class AdminGuard implements CanActivate {
     const userPayload = request['user'] as UserPayload;
 
     if (!userPayload) {
-      throw new UnauthorizedException('Unauthorized access (no user payload)');
+      throw new UnauthorizedException({
+        msg: { type: 'error', content: 'Um token é requerido para esta rota!' },
+      });
     }
 
     const userId = userPayload.sub;
 
     if (!userId) {
-      throw new UnauthorizedException('Unauthorized access (no user ID)');
+      throw new UnauthorizedException({
+        msg: {
+          type: 'error',
+          content: 'Um token válido é requerido para esta rota!',
+        },
+      });
     }
 
     const user = await this.userRepository.findOne({
@@ -36,11 +43,21 @@ export class AdminGuard implements CanActivate {
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException({
+        msg: {
+          type: 'error',
+          content: 'Usuário não encontrado!',
+        },
+      });
     }
 
     if (user.type !== 1) {
-      throw new UnauthorizedException('Only admins can access this resource');
+      throw new UnauthorizedException({
+        msg: {
+          type: 'error',
+          content: 'Acesso negado!',
+        },
+      });
     }
 
     return true;
