@@ -14,7 +14,6 @@ export class FavoritesController {
     @Body() createFavoriteDto: CreateFavoriteDto,
     @GetUserFromPayload('sub') user_id: number,
   ) {
-    console.log(user_id);
     return this.favoritesService.createOrDelete(createFavoriteDto, user_id);
   }
 }

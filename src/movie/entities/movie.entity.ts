@@ -27,6 +27,9 @@ export class MovieEntity {
   @Column()
   cover: string;
 
+  @Column()
+  category_id: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
