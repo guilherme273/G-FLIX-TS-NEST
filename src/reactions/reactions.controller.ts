@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { ReactionsService } from './reactions.service';
 import { CreateReactionDto } from './dto/create-reaction.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -18,5 +18,11 @@ export class ReactionsController {
       createReactionDto,
       user_id,
     );
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  findAll() {
+    return this.reactionsService.findAll();
   }
 }

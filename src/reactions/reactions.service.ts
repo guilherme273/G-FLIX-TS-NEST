@@ -34,7 +34,7 @@ export class ReactionsService {
           return {
             msg: {
               type: 'success',
-              content: 'Deletada a reação existente',
+              content: 'Reação Deletada!',
             },
           };
         }
@@ -75,6 +75,17 @@ export class ReactionsService {
           content: 'Error ao manipular reações, contate o suporte!',
         },
       });
+    }
+  }
+
+  async findAll() {
+    try {
+      const reactions = await this.reactionsRepository.find();
+      return {
+        reactions,
+      };
+    } catch (error) {
+      console.log(error);
     }
   }
 }

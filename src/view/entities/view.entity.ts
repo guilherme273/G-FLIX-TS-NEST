@@ -20,6 +20,9 @@ export class ViewEntity {
   @Column()
   id_movie: number;
 
+  @Column()
+  seconds_watched: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

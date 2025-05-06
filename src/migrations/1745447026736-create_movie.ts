@@ -6,6 +6,7 @@ export class CreateMovie1745447026736 implements MigrationInterface {
         CREATE TABLE movie (
         id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
+        youtube_id VARCHAR(255) NOT NULL,
         url VARCHAR(500) NOT NULL,
         cover VARCHAR(500),
         category_id INT,

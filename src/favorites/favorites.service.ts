@@ -50,4 +50,15 @@ export class FavoritesService {
       });
     }
   }
+
+  async findAll() {
+    try {
+      const favorites = await this.favoritesRepository.find();
+      return {
+        favorites,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

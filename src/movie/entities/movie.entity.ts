@@ -30,6 +30,9 @@ export class MovieEntity {
   @Column()
   category_id: number;
 
+  @Column()
+  youtube_id: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

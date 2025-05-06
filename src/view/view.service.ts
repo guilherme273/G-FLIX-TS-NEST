@@ -14,7 +14,8 @@ export class ViewService {
 
   async create(createViewDto: CreateViewDto, user_id: number) {
     const view = await this.viewRepository.save({
-      ...createViewDto,
+      id_movie: createViewDto.id_movie,
+      seconds_watched: createViewDto.seconds_watched,
       id_user: user_id,
     });
     return {

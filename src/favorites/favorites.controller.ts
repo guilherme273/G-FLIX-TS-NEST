@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -15,5 +15,11 @@ export class FavoritesController {
     @GetUserFromPayload('sub') user_id: number,
   ) {
     return this.favoritesService.createOrDelete(createFavoriteDto, user_id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  findAll() {
+    return this.favoritesService.findAll();
   }
 }

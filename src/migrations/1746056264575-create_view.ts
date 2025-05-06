@@ -6,6 +6,7 @@ export class CreateView1746056264575 implements MigrationInterface {
         id INT NOT NULL AUTO_INCREMENT,
         id_user INT NOT NULL,
         id_movie INT NOT NULL,
+        seconds_watched INT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),

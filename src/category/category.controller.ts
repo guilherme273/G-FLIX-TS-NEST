@@ -22,6 +22,7 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.categoryService.findAll();
