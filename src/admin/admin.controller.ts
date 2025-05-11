@@ -24,14 +24,21 @@ export class AdminController {
     return true;
   }
 
+  @UseGuards(AuthGuard, AdminGuard)
+  @Get('overview')
+  getOverview() {
+    return this.adminService.overview();
+  }
+
+  @UseGuards(AuthGuard, AdminGuard)
+  @Get('users')
+  getUsers() {
+    return this.adminService.getUsers();
+  }
+
   @Post()
   create(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.adminService.findAll();
   }
 
   @Get(':id')
