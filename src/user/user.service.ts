@@ -18,11 +18,11 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userReposytory: Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const existingUser = await this.userReposytory.findOne({
+    const existingUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
     });
 
@@ -37,13 +37,13 @@ export class UserService {
 
     try {
       const password = await hash(createUserDto.password, 15);
-      const user = this.userReposytory.create({
+      const user = this.userRepository.create({
         ...createUserDto,
         password: password,
         type: 0,
       });
 
-      const savedUser = await this.userReposytory.save(user);
+      const savedUser = await this.userRepository.save(user);
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...userWithoutPassword } = savedUser;
@@ -69,7 +69,7 @@ export class UserService {
     updateUserPasswordDto: UpdateUserPasswordDto,
     user_id: number,
   ) {
-    const user = await this.userReposytory.findOne({ where: { id: user_id } });
+    const user = await this.userRepository.findOne({ where: { id: user_id } });
 
     if (!user) {
       throw new NotFoundException({
@@ -89,7 +89,7 @@ export class UserService {
 
     const newPassword = await hash(updateUserPasswordDto.newPassword, 15);
     user.password = newPassword;
-    await this.userReposytory.save(user);
+    await this.userRepository.save(user);
 
     return {
       msg: {
@@ -100,14 +100,17 @@ export class UserService {
   }
 
   async findAll() {
-    const users = await this.userReposytory.find();
+    const users = await this.userRepository.find();
     return {
       users,
     };
   }
 
   async findOne(id: number) {
-    const user = await this.userReposytory.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      select: ['id', 'name', 'email', 'type'],
+      where: { id },
+    });
 
     if (!user) {
       throw new NotFoundException({

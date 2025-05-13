@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
@@ -9,10 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+
+import { ChangePermissionDto } from './dto/update-admin.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AdminGuard } from './adminGuard';
+import { GetUserFromPayload } from 'src/Decorators/user.decorator';
 
 @Controller('admin')
 export class AdminController {
@@ -36,9 +36,25 @@ export class AdminController {
     return this.adminService.getUsers();
   }
 
-  @Post()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.create(createAdminDto);
+  @UseGuards(AuthGuard, AdminGuard)
+  @Get('movies')
+  getMovies() {
+    return this.adminService.getMovies();
+  }
+
+  @UseGuards(AuthGuard, AdminGuard)
+  @Delete('user/:id')
+  deleteUser(
+    @Param('id') id: string,
+    @GetUserFromPayload('sub') user_id: number,
+  ) {
+    return this.adminService.deleteUser(+id, user_id);
+  }
+
+  @UseGuards(AuthGuard, AdminGuard)
+  @Delete('movie/:id')
+  deleteMovie(@Param('id') id: string) {
+    return this.adminService.deleteMovie(+id);
   }
 
   @Get(':id')
@@ -46,9 +62,10 @@ export class AdminController {
     return this.adminService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
-    return this.adminService.update(+id, updateAdminDto);
+  @UseGuards(AuthGuard, AdminGuard)
+  @Patch('change-permission')
+  update(@Body() changePermissionDto: ChangePermissionDto) {
+    return this.adminService.changePermission(changePermissionDto);
   }
 
   @Delete(':id')
