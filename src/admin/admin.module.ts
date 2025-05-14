@@ -8,6 +8,8 @@ import { MovieEntity } from 'src/movie/entities/movie.entity';
 import { FavoritesEntity } from 'src/favorites/entities/favorite.entity';
 import { ReactionsEntity } from 'src/reactions/entities/reaction.entity';
 import { CategoryEntity } from 'src/category/entities/category.entity';
+import { HttpModule } from '@nestjs/axios';
+import { ViewEntity } from 'src/view/entities/view.entity';
 
 @Module({
   imports: [
@@ -17,8 +19,10 @@ import { CategoryEntity } from 'src/category/entities/category.entity';
       FavoritesEntity,
       ReactionsEntity,
       CategoryEntity,
+      ViewEntity,
     ]),
     AuthModule,
+    HttpModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

@@ -1,9 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { Injectable } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity';
 import { Repository } from 'typeorm';
@@ -15,44 +11,15 @@ export class CategoryService {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto) {
-    const category = await this.categoryRepository.findOne({
-      where: { name: createCategoryDto.name },
-    });
-
-    if (category) {
-      throw new ConflictException({
-        msg: {
-          type: 'error',
-          content: `Categoria: ${category.name} já cadastrada!`,
-        },
-      });
-    }
-
+  async findAll() {
     try {
-      const categoryCreated =
-        await this.categoryRepository.save(createCategoryDto);
-
+      const categories = await this.categoryRepository.find();
       return {
-        categoryCreated,
-        msg: {
-          type: 'success',
-          content: `Categoria: ${categoryCreated.name} cadastrada com sucesso!`,
-        },
+        categories,
       };
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException({
-        msg: {
-          type: 'error',
-          content: 'erro no servidor ao salvar categoria, contate o suporte!',
-        },
-      });
     }
-  }
-
-  findAll() {
-    return this.categoryRepository.find();
   }
 
   findOne(id: number) {
